@@ -1,0 +1,15 @@
+[package]
+name = "qudoku"
+version = "0.1.0"
+edition = "2021"
+authors = ["conduition"]
+readme = "README.md"
+license = "Unlicense"
+repository = "https://github.com/conduition/qudoku"
+keywords = ["shamir", "secp256k1", "elliptic", "secret", "sharing"]
+
+[dependencies]
+secp = { version = "0.2.0", default-features = false, features = ["k256"] }
+
+[package.metadata.docs.rs]
+all-features = true
