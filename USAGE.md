@@ -4,7 +4,9 @@ This example demonstrates basic Shamir Secret Sharing, and then extends it by cr
 
 ```rust
 #![allow(non_snake_case)]
-#![cfg(feature = "rand")]
+
+# #[cfg(feature = "rand")]
+# {
 use secp::{MaybeScalar, Scalar};
 use qudoku::{
   InterpolatedPointPolynomial, InterpolatedSecretPolynomial, Polynomial, SecretShare, SecretSharingPolynomial,
@@ -77,4 +79,5 @@ assert_eq!(
   hex::encode(&c),
   "ec4f719940a443dd5377124a07e12424757db3e0976e9d206c5652ae3441c545"
 );
+# }
 ```

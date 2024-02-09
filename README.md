@@ -2,13 +2,17 @@
 
 A nested threshold system to complement [Shamir's Secret Sharing (SSS)][SSS] groups with an arbitrary amount of additional secrets, at no additional storage burden on the part of the shareholders.
 
-For usage documentation, see [docs.rs](https://docs.rs/qudoku).
-
 > [!CAUTION]
 >
 > This library is **highly experimental** cryptographic software, designed for a specialized use-case.
 >
 > Do not use this code in production.
+
+### Usage
+
+For usage documentation, see [docs.rs](https://docs.rs/qudoku).
+
+## Background
 
 Consider a [SSS] group with threshold $t$ and $n$ shares in some shared secret $k$.
 

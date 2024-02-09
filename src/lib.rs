@@ -1,4 +1,10 @@
-#![doc = include_str!("../README.md")]
+//! A nested threshold system to complement
+//! [Shamir's Secret Sharing (SSS)](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing)
+//! groups with an arbitrary amount of additional secrets, at no additional
+//! storage burden on the part of the shareholders.
+//!
+//! See [the README](https://github.com/conduition/qudoku) for a general
+//! description of what this package does.
 #![doc = include_str!("../USAGE.md")]
 
 mod hashing;
