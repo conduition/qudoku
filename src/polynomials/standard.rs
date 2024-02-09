@@ -1,5 +1,7 @@
 use std::ops::{Add, Mul};
 
+use crate::Polynomial;
+
 /// Evaluate a standard-form polynomial using
 /// [Horner's method](https://en.wikipedia.org/wiki/Horner%27s_method).
 ///
@@ -43,30 +45,34 @@ impl<T> StandardFormPolynomial<T> {
     pub fn new(coefficients: Vec<T>) -> Self {
         Self { coefficients }
     }
+}
 
-    /// Returns the degree of the polynomial, which is usually the number of coefficients
-    /// minus 1. If the polynomial has no coefficients, it has degree zero.
-    pub fn degree(&self) -> usize {
-        match self.coefficients.len() {
+impl<I, T> Polynomial<I, T> for StandardFormPolynomial<T>
+where
+    I: Copy,
+    T: Copy + num_traits::Zero,
+    T: Mul<I, Output = T> + Add<T, Output = T>,
+{
+    fn evaluate(&self, x: I) -> T {
+        horner_poly_evaluate(x, self.coefficients.as_ref())
+    }
+
+    fn degree(&self) -> usize {
+        let mut degree = match self.coefficients.len() {
             0 => 0,
             t => t - 1,
+        };
+
+        // Do not count trailing zero coefficients.
+        for &coeff in self.coefficients.iter().rev() {
+            if coeff.is_zero() {
+                degree -= 1;
+            } else {
+                break;
+            }
         }
-    }
 
-    /// Returns the number of evaluations needed to interpolate this polynomial,
-    /// which is just the number of coefficients in the polynomial.
-    pub fn interpolation_threshold(&self) -> usize {
-        self.coefficients.len()
-    }
-
-    /// Evaluate the polynomial on a given input.
-    pub fn evaluate<I>(&self, x: I) -> T
-    where
-        I: Copy,
-        T: Copy + num_traits::Zero,
-        T: Mul<I, Output = T> + Add<T, Output = T>,
-    {
-        horner_poly_evaluate(x, self.coefficients.as_ref())
+        return degree;
     }
 }
 

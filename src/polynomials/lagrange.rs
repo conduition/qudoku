@@ -1,6 +1,6 @@
 use std::ops::{Add, Div, Mul, Sub};
 
-use crate::Evaluation;
+use crate::{Evaluation, Polynomial};
 
 /// Evaluate a [Lagrange basis polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial).
 ///
@@ -56,22 +56,22 @@ impl<I, O> LagrangePolynomial<I, O> {
     pub fn new(evaluations: Vec<Evaluation<I, O>>) -> Self {
         Self { evaluations }
     }
+}
 
-    /// Evaluate an interpolated polynomial from a set of evaluations.
-    ///
-    /// Uses [Lagrange Interpolation](https://en.wikipedia.org/wiki/Lagrange_polynomial).
-    pub fn evaluate(&self, x: I) -> O
-    where
-        I: Copy + PartialEq,
-        I: num_traits::One + num_traits::Zero,
-        I: Sub<I, Output = I>,
-        I: Div<I, Output = I>,
-        I: Mul<I, Output = I>,
-        O: Copy,
-        O: num_traits::Zero,
-        O: Mul<I, Output = O>,
-        O: Add<O, Output = O>,
-    {
+impl<I, O> Polynomial<I, O> for LagrangePolynomial<I, O>
+where
+    I: Copy + PartialEq,
+    I: num_traits::One + num_traits::Zero,
+    I: Sub<I, Output = I>,
+    I: Div<I, Output = I>,
+    I: Mul<I, Output = I>,
+    O: Copy,
+    O: num_traits::Zero,
+    O: Mul<I, Output = O>,
+    O: Add<O, Output = O>,
+{
+    // Uses [Lagrange Interpolation](https://en.wikipedia.org/wiki/Lagrange_polynomial).
+    fn evaluate(&self, x: I) -> O {
         let mut out = O::zero();
 
         for (i, eval) in self.evaluations.iter().enumerate() {
@@ -79,6 +79,10 @@ impl<I, O> LagrangePolynomial<I, O> {
         }
 
         out
+    }
+
+    fn degree(&self) -> usize {
+        self.evaluations.len()
     }
 }
 
