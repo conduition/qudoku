@@ -1,7 +1,8 @@
 use secp::Point;
 use sha2::Digest as _;
 
-pub fn sha256(input: &[u8]) -> [u8; 32] {
+/// Compute the SHA256 hash of some input data.
+pub(crate) fn sha256(input: &[u8]) -> [u8; 32] {
     sha2::Sha256::new().chain_update(input).finalize().into()
 }
 

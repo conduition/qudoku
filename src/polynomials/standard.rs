@@ -2,14 +2,15 @@ use std::ops::{Add, Mul};
 
 use crate::Polynomial;
 
-/// Evaluate a standard-form polynomial using
-/// [Horner's method](https://en.wikipedia.org/wiki/Horner%27s_method).
+/// Evaluate a standard-form polynomial using [Horner's method].
 ///
 /// The `coefficients` are assumed to be presented in ascending order of degree,
 /// starting with the constant term `coefficients[0]`.
 ///
 /// The coefficient type `T`, input type `I`, and output type `O` are generic so
 /// that this function can be reused for any kind of [`Polynomial`].
+///
+/// [Horner's method]: https://en.wikipedia.org/wiki/Horner%27s_method
 fn horner_poly_evaluate<I, T, O>(x: I, coefficients: &[T]) -> O
 where
     O: Copy,
@@ -47,7 +48,8 @@ impl<T> StandardFormPolynomial<T> {
     }
 
     /// Returns the degree of the polynomial, which is usually the number of coefficients
-    /// minus 1. If the polynomial has no coefficients, it has degree zero.
+    /// minus 1. If the polynomial has no coefficients, it has degree zero. If trailing
+    /// coefficients are zero, those are not counted towards the degree.
     pub fn degree(&self) -> usize
     where
         T: num_traits::Zero,

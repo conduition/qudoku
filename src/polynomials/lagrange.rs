@@ -1,9 +1,9 @@
 use crate::{Evaluation, Polynomial};
 use std::ops::{Add, Mul, Sub};
 
-/// MaybeScalar does not implement Div<MaybeScalar>, for safety reasons.
-/// The `UnsafeDiv` trait explicitly works around this.
-pub(crate) trait UnsafeDiv<T> {
+/// [`secp::MaybeScalar`] does not implement [`std::ops::Div`] on itself
+/// for safety reasons. The `UnsafeDiv` trait explicitly works around this.
+pub trait UnsafeDiv<T> {
     type Output;
 
     fn unsafe_div(num: Self, denom: T) -> Self::Output;
@@ -97,11 +97,17 @@ where
     I::unsafe_div(top, bottom)
 }
 
+/// Represents a polynomial which can be evaluated using [Lagrange Interpolation]
+/// on a set of evaluations.
+///
+/// [Lagrange Interpolation]: https://en.wikipedia.org/wiki/Lagrange_polynomial
 pub struct LagrangePolynomial<I, O> {
     pub evaluations: Vec<Evaluation<I, O>>,
 }
 
 impl<I, O> LagrangePolynomial<I, O> {
+    /// Construct a Lagrange Polynomial which interpolates the given set of evaluations.
+    ///
     /// The evaluations are expected to have distinct input values.
     /// If two or more evaluations reuse the same input, evaluation and
     /// share-issuance will cause panics.
@@ -124,7 +130,6 @@ where
     O: Mul<I, Output = O>,
     O: Add<O, Output = O>,
 {
-    // Uses [Lagrange Interpolation](https://en.wikipedia.org/wiki/Lagrange_polynomial).
     fn evaluate(&self, x: I) -> O {
         let mut out = O::zero();
 

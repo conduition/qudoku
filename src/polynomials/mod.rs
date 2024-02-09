@@ -6,6 +6,8 @@ pub use evaluation::*;
 pub use lagrange::*;
 pub use standard::*;
 
+/// A trait common to any class of univariate polynomial function with input type `I`
+/// and output type `O`.
 pub trait Polynomial<I, O> {
     /// Evaluate the polynomial on a given input.
     fn evaluate(&self, input: I) -> O;
