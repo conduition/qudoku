@@ -1,3 +1,6 @@
+#![doc = include_str!("../README.md")]
+#![doc = include_str!("../USAGE.md")]
+
 mod hashing;
 mod ops;
 mod polynomials;

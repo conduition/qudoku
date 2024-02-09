@@ -25,11 +25,11 @@ pub type InterpolatedPointPolynomial = LagrangePolynomial<MaybeScalar, MaybePoin
 macro_rules! impl_issue_share {
     ( $t:ty, $share:ty ) => {
         impl $t {
-            /// Issue a share at the given `input` index.
-            pub fn issue_share(&self, input: MaybeScalar) -> $share {
+            /// Issue a share at the given input `x`.
+            pub fn issue_share(&self, x: MaybeScalar) -> $share {
                 Evaluation {
-                    input,
-                    output: self.evaluate(input),
+                    input: x,
+                    output: self.evaluate(x),
                 }
             }
         }
