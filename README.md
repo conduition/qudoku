@@ -59,19 +59,19 @@ For this library, we'll be using the secp256k1 curve. Noteworthy parameters of t
 
 Elliptic curve points can be added and subtracted, but not multiplied or divided by one-another. This means that scalar-point multiplication is a one-way operation which cannot be reversed (without a quantum computer).
 
-## Hash Functions
-
-We also will require some hash functions.
-
-| Symbol | Meaning |
-|:------:|:-------:|
-| $H(x)$ | A cryptographically secure hash function. |
-| $\mathcal{H}(x)$ | A secure hash function which maps an input to a point on the secp256k1 curve _with an unknown discrete log relative to_ $G$. For example, this could be implemented using $H(x)$ and the try-and-increment algorithm. Constant-time operation is not required for $\mathcal{H}(x)$. |
-
 # Algorithm
 
-TODO
+The [SSS] protocol designer must first fix a chosen constant point $Q$ (from which **qu**doku derives its name).
 
+This point must have an important property: It must have an unknown discrete logarithm with respect to the curve base point $G$. This means that if $xG = Q$, then $x$ must exist but should not be known by anybody, including the dealer or protocol designer.
+
+The best way to prove such a point has this property is to derive it using a nothing-up-my-sleeve approach, which demonstrates the point was selected in a way nobody could have chosen it intentionally while knowing its discrete log.
+
+One such example is to generate a point by hashing some honest-looking input data, and then interpreting that hash as the X coordinate of an elliptic curve point. The pseudo-random and unpredictable nature of a secure hash function ensures that the X coordinate is effectively random. This prevents the generator from choosing a specific point which a known discrete log. The hash can be repeated to verify the point is indeed random and honestly chosen.
+
+Not all hash outputs are valid X coordinates on the secp256k1 curve though, so you may need to increment the output a couple of times to find a valid curve point. When you find a valid X coordinate, you can select either the odd or even parity Y-coordinate which comes along with it - Either are equally honest and usable.
+
+TODO
 
 [SSS]: https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing
 [BIP39]: https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
