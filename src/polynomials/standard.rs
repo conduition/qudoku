@@ -45,6 +45,29 @@ impl<T> StandardFormPolynomial<T> {
     pub fn new(coefficients: Vec<T>) -> Self {
         Self { coefficients }
     }
+
+    /// Returns the degree of the polynomial, which is usually the number of coefficients
+    /// minus 1. If the polynomial has no coefficients, it has degree zero.
+    pub fn degree(&self) -> usize
+    where
+        T: num_traits::Zero,
+    {
+        let mut degree = match self.coefficients.len() {
+            0 => 0,
+            t => t - 1,
+        };
+
+        // Do not count trailing zero coefficients.
+        for coeff in self.coefficients.iter().rev() {
+            if coeff.is_zero() && degree > 0 {
+                degree -= 1;
+            } else {
+                break;
+            }
+        }
+
+        return degree;
+    }
 }
 
 impl<I, T> Polynomial<I, T> for StandardFormPolynomial<T>
@@ -58,21 +81,7 @@ where
     }
 
     fn degree(&self) -> usize {
-        let mut degree = match self.coefficients.len() {
-            0 => 0,
-            t => t - 1,
-        };
-
-        // Do not count trailing zero coefficients.
-        for &coeff in self.coefficients.iter().rev() {
-            if coeff.is_zero() {
-                degree -= 1;
-            } else {
-                break;
-            }
-        }
-
-        return degree;
+        StandardFormPolynomial::degree(self)
     }
 }
 
@@ -87,7 +96,7 @@ mod tests {
         assert_eq!(StandardFormPolynomial::new(vec![1]).degree(), 0);
         assert_eq!(StandardFormPolynomial::new(vec![2, 2]).degree(), 1);
         assert_eq!(StandardFormPolynomial::new(vec![3, 3, 3]).degree(), 2);
-        assert_eq!(StandardFormPolynomial::new(vec![0, 0, 0]).degree(), 2);
+        assert_eq!(StandardFormPolynomial::new(vec![0, 0, 0]).degree(), 0);
     }
 
     #[test]

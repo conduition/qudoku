@@ -1,6 +1,48 @@
-use std::ops::{Add, Div, Mul, Sub};
-
 use crate::{Evaluation, Polynomial};
+use std::ops::{Add, Mul, Sub};
+
+/// MaybeScalar does not implement Div<MaybeScalar>, for safety reasons.
+/// The `UnsafeDiv` trait explicitly works around this.
+pub(crate) trait UnsafeDiv<T> {
+    type Output;
+
+    fn unsafe_div(num: Self, denom: T) -> Self::Output;
+}
+
+mod unsafe_div_impls {
+    use super::*;
+    use secp::MaybeScalar;
+
+    macro_rules! impl_unsafe_div {
+        ( $($t:ty),* ) => {
+            $(
+                impl UnsafeDiv<$t> for $t {
+                    type Output = $t;
+                    fn unsafe_div(num: $t, denom: $t) -> Self::Output {
+                        num / denom
+                    }
+                }
+            )*
+        };
+    }
+
+    impl_unsafe_div! {
+       i8, i16, i32, i64, i128,
+       u8, u16, u32, u64, u128,
+       usize, f32, f64
+    }
+
+    impl UnsafeDiv<MaybeScalar> for MaybeScalar {
+        type Output = MaybeScalar;
+
+        fn unsafe_div(num: MaybeScalar, denom: MaybeScalar) -> Self::Output {
+            match denom {
+                MaybeScalar::Valid(d) => num / d,
+                MaybeScalar::Zero => unreachable!("divided by zero scalar"),
+            }
+        }
+    }
+}
 
 /// Evaluate a [Lagrange basis polynomial](https://en.wikipedia.org/wiki/Lagrange_polynomial).
 ///
@@ -11,11 +53,13 @@ use crate::{Evaluation, Polynomial};
 /// The output is unpredictable for inputs which are not part of `evaluations`.
 fn langrange_poly_evaluate<I, O>(evaluations: &[Evaluation<I, O>], eval_index: usize, x: I) -> I
 where
-    I: Copy + PartialEq,
-    I: num_traits::One + num_traits::Zero,
-    I: Sub<I, Output = I>,
-    I: Div<I, Output = I>,
-    I: Mul<I, Output = I>,
+    I: Copy
+        + PartialEq
+        + num_traits::One
+        + num_traits::Zero
+        + Sub<I, Output = I>
+        + UnsafeDiv<I, Output = I>
+        + Mul<I, Output = I>,
 {
     let xj = evaluations[eval_index].input;
 
@@ -41,9 +85,16 @@ where
         }
 
         bottom = bottom * (xj - eval.input);
+
+        // Invariant
+        debug_assert!(
+            !bottom.is_zero(),
+            "shares include duplicate evaluation inputs, causing div-by-zero error"
+        );
     }
 
-    top / bottom
+    // top / bottom
+    I::unsafe_div(top, bottom)
 }
 
 pub struct LagrangePolynomial<I, O> {
@@ -52,7 +103,8 @@ pub struct LagrangePolynomial<I, O> {
 
 impl<I, O> LagrangePolynomial<I, O> {
     /// The evaluations are expected to have distinct input values.
-    /// If two or more evaluations reuse the same input, evaluation will cause panics.
+    /// If two or more evaluations reuse the same input, evaluation and
+    /// share-issuance will cause panics.
     pub fn new(evaluations: Vec<Evaluation<I, O>>) -> Self {
         Self { evaluations }
     }
@@ -60,11 +112,13 @@ impl<I, O> LagrangePolynomial<I, O> {
 
 impl<I, O> Polynomial<I, O> for LagrangePolynomial<I, O>
 where
-    I: Copy + PartialEq,
-    I: num_traits::One + num_traits::Zero,
-    I: Sub<I, Output = I>,
-    I: Div<I, Output = I>,
-    I: Mul<I, Output = I>,
+    I: Copy
+        + PartialEq
+        + num_traits::One
+        + num_traits::Zero
+        + Sub<I, Output = I>
+        + UnsafeDiv<I, Output = I>
+        + Mul<I, Output = I>,
     O: Copy,
     O: num_traits::Zero,
     O: Mul<I, Output = O>,
@@ -82,7 +136,10 @@ where
     }
 
     fn degree(&self) -> usize {
-        self.evaluations.len()
+        match self.evaluations.len() {
+            0 => 0,
+            t => t - 1,
+        }
     }
 }
 
