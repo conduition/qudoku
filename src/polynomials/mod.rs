@@ -1,6 +1,8 @@
+mod evaluation;
 mod lagrange;
 mod standard;
 
+pub use evaluation::*;
 pub use lagrange::*;
 pub use standard::*;
 
