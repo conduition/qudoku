@@ -118,13 +118,14 @@ To reduce this threshold from $t$ to any $t' \le t$, the group or dealer must pr
 
 These pre-shared evaluations must each use an input $i$ which is distinct from those of the shareholders' shares. Reusing input indexes would mean some shareholders cannot have a meaningful inpact in assisting the recipient with interpolating $Z(x)$, because their shares of $Z(x)$ may already be known to the recipient.
 
-The pre-shared shares can be computed by, for example:
+The pre-shared share indexes can be chosen by, for example:
+
 - reserving specific indexes for the pre-shared shares, e.g. $\\{q-1, q-2, ... q-t'\\}$, which the existing shareholders are guaranteed not to be using.
 - sampling random indexes from $[1, q)$. Because $q$ is very large, so collision with a shareholder is very unlikely.
 
-If the [SSS] dealer is available, they can compute these values directly, because they know $Z(x)$.
+If the [SSS] dealer is available, they can compute the pre-shares directly, because they know $Z(x)$.
 
-If not, the shareholders may need to [use multi-party computation to issue new shares of $Z(x)$ directly to the recipient](https://conduition.io/cryptography/shamir/).
+If not, the shareholders may need to [use multi-party computation to issue pre-shares directly to the recipient](https://conduition.io/cryptography/shamir/).
 
 Following our earlier example with the encrypted recovery server, the [SSS] group would fix $Q$ in advance, and pre-share $t-1$ shares of $Z(x) = f(x) \cdot Q$ with the recovery server. The contact information would be encrypted with $c = H(Z(s))$. When any of the shareholders with share $(i, f(i))$ initiates the recovery procedure, they provide $(i, Z(i))$ to the server, which can then interpolate $Z(x)$ and compute $c = H(Z(s))$, allowing it to decrypt the contact information.
 
