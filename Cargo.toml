@@ -3,6 +3,7 @@ name = "qudoku"
 version = "0.1.0"
 edition = "2021"
 authors = ["conduition"]
+description = "Shamir Secret Sharing implementation, including a novel nested threshold secret system to complement existing SSS groups."
 readme = "README.md"
 license = "Unlicense"
 repository = "https://github.com/conduition/qudoku"

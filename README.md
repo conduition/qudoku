@@ -2,6 +2,8 @@
 
 A nested threshold system to complement [Shamir's Secret Sharing (SSS)][SSS] groups with an arbitrary amount of additional secrets, at no additional storage burden on the part of the shareholders.
 
+For usage documentation, see [docs.rs](https://docs.rs/qudoku).
+
 > [!CAUTION]
 >
 > This library is **highly experimental** cryptographic software, designed for a specialized use-case.
@@ -149,7 +151,6 @@ For each point $Q_i$, the shareholders define $Z_i(x) := f(x) \cdot Q_i$, and co
 > $$
 
 Assuming all $Q$ points are co-prime, then nobody can multiplicatively relate shares of any $Z_a(x)$ polynomial with another polynomial $Z_b(x)$, and so all derivative secrets $\\{c_1, c_2, ... c_m\\}$ are completely independent.
-
 
 [SSS]: https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing
 [BIP39]: https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki
