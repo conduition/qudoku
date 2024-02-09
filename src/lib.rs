@@ -1,4 +1,5 @@
 mod hashing;
+mod ops;
 mod polynomials;
 mod sharing;
 
