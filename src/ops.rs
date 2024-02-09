@@ -1,9 +1,69 @@
 use crate::{
-    Evaluation, InterpolatedPointPolynomial, InterpolatedSecretPolynomial, PointSharingPolynomial,
-    SecretSharingPolynomial,
+    Evaluation, InterpolatedPointPolynomial, InterpolatedSecretPolynomial, PointShare,
+    PointSharingPolynomial, SecretShare, SecretSharingPolynomial,
 };
 use secp::{Point, G};
 use std::ops::Mul;
+
+/// Allows multiplying a secret share by a given fixed point.
+impl Mul<&SecretShare> for Point {
+    type Output = PointShare;
+
+    fn mul(self, rhs: &SecretShare) -> Self::Output {
+        Evaluation {
+            input: rhs.input,
+            output: rhs.output * self,
+        }
+    }
+}
+impl Mul<Point> for &SecretShare {
+    type Output = PointShare;
+    fn mul(self, rhs: Point) -> Self::Output {
+        rhs * self
+    }
+}
+impl Mul<SecretShare> for Point {
+    type Output = PointShare;
+    fn mul(self, rhs: SecretShare) -> Self::Output {
+        self * &rhs
+    }
+}
+impl Mul<Point> for SecretShare {
+    type Output = PointShare;
+    fn mul(self, rhs: Point) -> Self::Output {
+        rhs * self
+    }
+}
+
+/// Allows multiplying a secret share by the secp256k1 generator point.
+impl Mul<&SecretShare> for G {
+    type Output = PointShare;
+
+    fn mul(self, rhs: &SecretShare) -> Self::Output {
+        Evaluation {
+            input: rhs.input,
+            output: rhs.output * G,
+        }
+    }
+}
+impl Mul<G> for &SecretShare {
+    type Output = PointShare;
+    fn mul(self, rhs: G) -> Self::Output {
+        rhs * self
+    }
+}
+impl Mul<SecretShare> for G {
+    type Output = PointShare;
+    fn mul(self, rhs: SecretShare) -> Self::Output {
+        self * &rhs
+    }
+}
+impl Mul<G> for SecretShare {
+    type Output = PointShare;
+    fn mul(self, rhs: G) -> Self::Output {
+        rhs * self
+    }
+}
 
 /// Allows multiplying a secret sharing polynomial by a given fixed point.
 impl Mul<&SecretSharingPolynomial> for Point {
@@ -164,5 +224,27 @@ mod tests {
 
         assert_eq!((&interpolated_f * G).evaluate(i), Z1.evaluate(i));
         assert_eq!((&interpolated_f * Q).evaluate(i), Z2.evaluate(i));
+    }
+
+    #[test]
+    fn test_secret_share_mul_point() {
+        let share = SecretShare::new(49.into(), 49999.into());
+
+        assert_eq!(
+            share * G,
+            PointShare {
+                input: MaybeScalar::from(49),
+                output: MaybeScalar::from(49999) * Point::generator(),
+            }
+        );
+
+        let P = G * Scalar::two();
+        assert_eq!(
+            share * P,
+            PointShare {
+                input: MaybeScalar::from(49),
+                output: MaybeScalar::from(49999) * P,
+            }
+        );
     }
 }
