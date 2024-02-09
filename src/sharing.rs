@@ -1,4 +1,4 @@
-use crate::{Evaluation, LagrangePolynomial, Polynomial, StandardFormPolynomial};
+use crate::{sha256, Evaluation, LagrangePolynomial, Polynomial, StandardFormPolynomial};
 use secp::{MaybePoint, MaybeScalar};
 
 /// Represents a secret share held by a shareholder.
@@ -40,3 +40,18 @@ impl_issue_share! { SecretSharingPolynomial, SecretShare }
 impl_issue_share! { PointSharingPolynomial, PointShare }
 impl_issue_share! { InterpolatedSecretPolynomial, SecretShare }
 impl_issue_share! { InterpolatedPointPolynomial, PointShare }
+
+macro_rules! impl_derive_secret {
+    ( $t:ty ) => {
+        impl $t {
+            /// Derive a secret `c` by hashing the output point produced by
+            /// evaluating the polynomial on `x`.
+            pub fn derive_secret(&self, x: MaybeScalar) -> [u8; 32] {
+                sha256(&self.evaluate(x).serialize())
+            }
+        }
+    };
+}
+
+impl_derive_secret! { PointSharingPolynomial }
+impl_derive_secret! { InterpolatedPointPolynomial }
