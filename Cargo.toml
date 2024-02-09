@@ -1,6 +1,6 @@
 [package]
 name = "qudoku"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["conduition"]
 description = "Shamir Secret Sharing implementation, including a novel nested threshold secret system to complement existing SSS groups."
